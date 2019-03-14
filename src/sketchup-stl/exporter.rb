@@ -362,6 +362,22 @@ module CommunityExtensions
         window.show
       end # do_options
 
+      # Hack, the popup with options does not work with wine
+      def self.force_export
+	export_entities = get_export_entities
+        if export_entities
+	   path = select_export_file
+           begin
+             export(path, export_entities, OPTIONS) unless path.nil?
+             rescue => exception
+             msg = "SketchUp STL Exporter:\n"
+             msg << "An error occured during export.\n\n"
+             msg << exception.message << "\n"
+             msg << exception.backtrace.join("\n")
+             UI.messagebox(msg, MB_MULTILINE)
+           end
+        end
+      end # force_export
 
       # Main entry point via menu item.
       # Display a message and exit if the model is empty, else
@@ -372,7 +388,7 @@ module CommunityExtensions
           msg << STL.translate("The model is empty - there is nothing to export.")
           UI.messagebox(msg, MB_OK)
         else
-          do_options
+          force_export
         end
       end
 
